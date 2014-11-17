@@ -1,4 +1,4 @@
-﻿// Copyright (c) Matt Saville and Alex Reed. All rights reserved.
+﻿// Copyright (c) Matt Saville and Alex Forbes-Reed. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;

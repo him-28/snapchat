@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Matt Saville & Alex Reed")]
-[assembly: AssemblyCopyright("Copyright © Matt Saville and Alex Reed")]
+[assembly: AssemblyCopyright("Copyright © Matt Saville and Alex Forbes-Reed")]
 [assembly: AssemblyDescription("Snapchat API for Universal Apps")]
 [assembly: AssemblyProduct("Snapchat")]
 [assembly: AssemblyTitle("Snapchat API")]
