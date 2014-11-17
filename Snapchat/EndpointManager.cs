@@ -6,11 +6,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Web.Http;
+using Windows.Web.Http.Headers;
+using Newtonsoft.Json;
 using Snapchat.Utilities;
 
 using UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding;
@@ -151,6 +154,125 @@ namespace Snapchat
 			return await client.PostAsync(endpoint, postBody);
 		}
 
+		/// <summary>
+		/// Sends a POST request to an API function.
+		/// </summary>
+		/// <param name="function">
+		/// The name of the function.
+		/// </param>
+		/// <param name="args">
+		/// A set of parameters to pass along with the request.
+		/// </param>
+		/// <returns>
+		/// A <see cref="HttpResponseMessage"/> received from the server.
+		/// </returns>
+		public async Task<HttpResponseMessage> PostAsync(string function, RequestParameters args)
+		{
+			Contract.Requires<ArgumentNullException>(function != null);
+			return await PostAsync(function, args, StaticToken, null);
+		}
+
+		/// <summary>
+		/// Sends a POST request to an API function using a <paramref name="token"/>, and deserializes
+		/// the response into the type specified by <typeparamref name="TResult"/>.
+		/// </summary>
+		/// <typeparam name="TResult">
+		/// The type of the object.
+		/// </typeparam>
+		/// <param name="function">
+		/// The name of the function.
+		/// </param>
+		/// <param name="args">
+		/// A set of parameters to pass along with the request.
+		/// </param>
+		/// <param name="token">
+		/// The auth token.
+		/// </param>
+		/// <param name="headerValues">
+		/// A dictionary containing additional headers to include in the POST request.
+		/// </param>
+		/// <returns>
+		/// Upon success, the deserialized object; otherwise, the default value of
+		/// <typeparamref name="TResult"/>.
+		/// </returns>
+		public async Task<TResult> PostAsync<TResult>(
+			string function, RequestParameters args, string token, Dictionary<string, string> headerValues)
+		{
+			Contract.Requires<ArgumentNullException>(function != null);
+			Contract.Requires<ArgumentNullException>(token != null);
+
+			var response = await PostAsync(function, args, token, headerValues);
+			if (!response.IsSuccessStatusCode)
+				return default(TResult);
+
+			// Obtain the JSON data (and decompress it if it is gzipped).
+			string jsonData;
+			if (response.Content.Headers.ContentEncoding.Contains(HttpContentCodingHeaderValue.Parse("gzip")))
+			{
+				var compressedData = (await response.Content.ReadAsBufferAsync()).ToArray();
+				jsonData = await Gzip.DecompressAsync(compressedData, Encoding.UTF8);
+			}
+			else
+			{
+				jsonData = await response.Content.ReadAsStringAsync();
+			}
+			Debug.WriteLine("[EndpointManager] Received JSON data: {0}", jsonData);
+
+			// Deserialize the JSON data and return it.
+			return await Task.Run(() => JsonConvert.DeserializeObject<TResult>(jsonData));
+		}
+
+		/// <summary>
+		/// Sends a POST request to an API function using a <paramref name="token"/>, and deserializes
+		/// the response into the type specified by <typeparamref name="TResult"/>.
+		/// </summary>
+		/// <typeparam name="TResult">
+		/// The type of the object.
+		/// </typeparam>
+		/// <param name="function">
+		/// The name of the function.
+		/// </param>
+		/// <param name="args">
+		/// A set of parameters to pass along with the request.
+		/// </param>
+		/// <param name="token">
+		/// The auth token.
+		/// </param>
+		/// <returns>
+		/// Upon success, the deserialized object; otherwise, the default value of
+		/// <typeparamref name="TResult"/>.
+		/// </returns>
+		public async Task<TResult> PostAsync<TResult>(string function, RequestParameters args, string token)
+		{
+			Contract.Requires<ArgumentNullException>(function != null);
+			Contract.Requires<ArgumentNullException>(token != null);
+
+			return await PostAsync<TResult>(function, args, token, null);
+		}
+
+		/// <summary>
+		/// Sends a POST request to an API function and deserializes the response into the type
+		/// specified by <typeparamref name="TResult"/>.
+		/// </summary>
+		/// <typeparam name="TResult">
+		/// The type of the object.
+		/// </typeparam>
+		/// <param name="function">
+		/// The name of the function.
+		/// </param>
+		/// <param name="args">
+		/// A set of parameters to pass along with the request.
+		/// </param>
+		/// <returns>
+		/// Upon success, the deserialized object; otherwise, the default value of
+		/// <typeparamref name="TResult"/>.
+		/// </returns>
+		public async Task<TResult> PostAsync<TResult>(string function, RequestParameters args)
+		{
+			Contract.Requires<ArgumentNullException>(function != null);
+			return await PostAsync<TResult>(function, args, StaticToken, null);
+		}
+
 		#endregion
 
 		#region GET
@@ -186,6 +308,35 @@ namespace Snapchat
 			var endpoint = new Uri(BaseUri, function);
 			Debug.WriteLine("[EndpointManager] Sending GET request to {0}", endpoint);
 			return await client.GetAsync(endpoint);
+		}
+
+		/// <summary>
+		/// Sends a GET request to an API function, and receives binary data from the server.
+		/// </summary>
+		/// <param name="function">
+		/// The name of the function.
+		/// </param>
+		/// <returns>
+		/// Upon success, a byte array containing the data received from the server; otherwise,
+		/// <c>null</c>.
+		/// </returns>
+		public async Task<byte[]> GetAsync(string function)
+		{
+			Contract.Requires<ArgumentNullException>(function != null);
+
+			var response = await GetAsync(function, null);
+			if (!response.IsSuccessStatusCode)
+				return null;
+
+			// Obtain the binary data (and decompress it if it is gzipped).
+			var data = (await response.Content.ReadAsBufferAsync()).ToArray();
+			if (response.Content.Headers.ContentEncoding.Contains(HttpContentCodingHeaderValue.Parse("gzip")))
+			{
+				data = await Gzip.DecompressAsync(data);
+			}
+			Debug.WriteLine("[EndpointManager] Received binary data ({0} bytes)", data.Length);
+
+			return data;
 		}
 
 		#endregion
