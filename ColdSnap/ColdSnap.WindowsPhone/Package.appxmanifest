@@ -1,44 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-
-  <Identity Name="8984b788-bc6c-4c70-8b4c-38ee1da4b1bf"
-            Publisher="CN=Matt"
-            Version="1.0.0.0" />
-
-  <mp:PhoneIdentity PhoneProductId="8984b788-bc6c-4c70-8b4c-38ee1da4b1bf" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
+  <Identity Name="8984b788-bc6c-4c70-8b4c-38ee1da4b1bf" Publisher="CN=Matt" Version="2.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="8984b788-bc6c-4c70-8b4c-38ee1da4b1bf" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>ColdSnap.WindowsPhone</DisplayName>
-    <PublisherDisplayName>Matt</PublisherDisplayName>
+    <DisplayName>ColdSnap</DisplayName>
+    <PublisherDisplayName>Windows Phone Community</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
-
   <Prerequisites>
     <OSMinVersion>6.3.1</OSMinVersion>
     <OSMaxVersionTested>6.3.1</OSMaxVersionTested>
   </Prerequisites>
-  
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
-    <Application Id="App"
-        Executable="$targetnametoken$.exe"
-        EntryPoint="ColdSnap.WindowsPhone.App">
-        <m3:VisualElements
-            DisplayName="ColdSnap.WindowsPhone"
-            Square150x150Logo="Assets\Logo.png"
-            Square44x44Logo="Assets\SmallLogo.png"
-            Description="ColdSnap.WindowsPhone"
-            ForegroundText="light"
-            BackgroundColor="transparent">
-            <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png"/>
-            <m3:SplashScreen Image="Assets\SplashScreen.png"/>
-        </m3:VisualElements>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ColdSnap.WindowsPhone.App">
+      <m3:VisualElements DisplayName="ColdSnap" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="Third party Snapchat app for Windows Phone" ForegroundText="light" BackgroundColor="transparent" ToastCapable="true">
+        <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
+        </m3:DefaultTile>
+        <m3:SplashScreen Image="Assets\SplashScreen.png" />
+        <m3:InitialRotationPreference>
+          <m3:Rotation Preference="portrait" />
+          <m3:Rotation Preference="landscape" />
+          <m3:Rotation Preference="landscapeFlipped" />
+        </m3:InitialRotationPreference>
+      </m3:VisualElements>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClientServer" />
+    <m3:Capability Name="contacts" />
+    <DeviceCapability Name="location" />
+    <DeviceCapability Name="microphone" />
+    <DeviceCapability Name="webcam" />
   </Capabilities>
 </Package>

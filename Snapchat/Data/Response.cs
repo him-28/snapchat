@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 
-namespace Snapchat.Data.Responses
+namespace Snapchat.Data
 {
 	/// <summary>
 	/// Represents a basic response from the Snapchat API.

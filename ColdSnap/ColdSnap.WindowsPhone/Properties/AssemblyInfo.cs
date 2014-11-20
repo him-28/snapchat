@@ -1,29 +1,12 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("ColdSnap.WindowsPhone")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ColdSnap.WindowsPhone")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCompany("Matt Saville & Alex Reed")]
+[assembly: AssemblyCopyright("Copyright © Matt Saville and Alex Forbes-Reed")]
+[assembly: AssemblyDescription("Third party Snapchat app for Windows Phone")]
+[assembly: AssemblyProduct("ColdSnap")]
+[assembly: AssemblyTitle("ColdSnap")]
+[assembly: AssemblyTrademark("Snapchat is a registered trademark of Snapchat, Inc.")]
+[assembly: AssemblyVersion("2.0.*")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: ComVisible(false)]
