@@ -15,7 +15,7 @@ namespace Snapchat
 		/// The default user agent to use when sending requests.
 		/// </summary>
 		public const string DefaultUserAgent =
-			"User-Agent: Snapchat/5.0.5 (Nexus 4; Android 19; gzip)";
+			"User-Agent: Snapchat/8.0.0 (Nexus 4; Android 21; gzip)";
 
 
 
