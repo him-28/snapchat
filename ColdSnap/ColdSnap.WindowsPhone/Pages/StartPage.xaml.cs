@@ -3,16 +3,22 @@ using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using ColdSnap.Common;
+using ColdSnap.Dialogs;
+using ColdSnap.ViewModels;
 
 namespace ColdSnap.Pages
 {
 	public sealed partial class StartPage
 	{
+		private readonly LogInDialog _logInDialog;
+
 		public StartPage()
 		{
 			InitializeComponent();
+			DataContext = ViewModel = new StartPageViewModel();
 
 			// Make the status bar overlay our app.
 			ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseCoreWindow);
@@ -20,11 +26,22 @@ namespace ColdSnap.Pages
 			// Lock rotation to portrait mode.
 			DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
 
+			// Set up login page.
+			_logInDialog = new LogInDialog();
+			_logInDialog.PrimaryButtonClick += LogInDialog_PrimaryButtonClick;
+
+			// Show login page by default.
+			Loaded += async delegate { await _logInDialog.ShowAsync(); };
 
 			NavigationHelper = new NavigationHelper(this);
 			NavigationHelper.LoadState += NavigationHelper_LoadState;
 			NavigationHelper.SaveState += NavigationHelper_SaveState;
 		}
+
+		/// <summary>
+		/// Gets the view model for this page.
+		/// </summary>
+		public StartPageViewModel ViewModel { get; private set; }
 
 		/// <summary>
 		/// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
@@ -71,7 +88,7 @@ namespace ColdSnap.Pages
 		/// session.  The state will be null the first time a page is visited.</param>
 		private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			// Clear backstack.
+			// Clear backstack (we shouldn't be able to go back to any other page after logging out).
 			(Window.Current.Content as Frame).BackStack.Clear();
 		}
 
@@ -85,6 +102,23 @@ namespace ColdSnap.Pages
 		/// serializable state.</param>
 		private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
 		{
+		}
+
+		private async void LogInButton_Tapped(object sender, TappedRoutedEventArgs e)
+		{
+			await _logInDialog.ShowAsync();
+		}
+
+		private async void LogInDialog_PrimaryButtonClick(ContentDialog dialog, ContentDialogButtonClickEventArgs args)
+		{
+			var deferral = args.GetDeferral();
+			dialog.IsEnabled = dialog.IsPrimaryButtonEnabled = dialog.IsSecondaryButtonEnabled = false;
+
+			await ViewModel.LogInAsync(_logInDialog.Username, _logInDialog.Password);
+			_logInDialog.Password = String.Empty; // clear the password field in case of a failed login
+
+			dialog.IsEnabled = dialog.IsPrimaryButtonEnabled = dialog.IsSecondaryButtonEnabled = true;
+			deferral.Complete();
 		}
 	}
 }

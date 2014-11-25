@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LogInGenericErrorMessage" xml:space="preserve">
+    <value>Failed to log in. Please try again later.</value>
+  </data>
   <data name="StartPageAppSubtitleTextBlock.Text" xml:space="preserve">
     <value>Snapchat for Windows Phone</value>
   </data>
@@ -128,5 +131,8 @@
   </data>
   <data name="StartPageSignUpButton.Content" xml:space="preserve">
     <value>SIGN UP</value>
+  </data>
+  <data name="StatusLoggingInMessage" xml:space="preserve">
+    <value>Logging in...</value>
   </data>
 </root>

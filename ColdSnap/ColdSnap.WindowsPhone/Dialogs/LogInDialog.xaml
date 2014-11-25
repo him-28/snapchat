@@ -1,0 +1,40 @@
+﻿<ContentDialog x:Class="ColdSnap.Dialogs.LogInDialog"
+			   x:Uid="LogInDialog"
+			   
+			   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			   
+			   DataContext="{Binding RelativeSource={RelativeSource Self}}"
+			   
+			   Title="LOG IN"
+			   PrimaryButtonText="log in"
+			   SecondaryButtonText="cancel"
+			   
+			   RequestedTheme="Dark"
+			   Background="{StaticResource AppThemeColorBrush}">
+	
+	<StackPanel>
+		<TextBox x:Uid="EmailOrUsernameTextBox"
+				 Name="UsernameTextBox"
+				 Header="Email or username"
+				 InputScope="EmailSmtpAddress"
+				 KeyDown="Username_KeyDown"
+				 MaxLength="100"
+				 Text="{Binding Username, Mode=TwoWay}"/>
+
+		<PasswordBox x:Uid="PasswordBox"
+					 Name="PasswordBox"
+					 Header="Password"
+					 KeyDown="Password_KeyDown"
+					 MaxLength="32"
+					 Password="{Binding Password, Mode=TwoWay}"/>
+
+		<HyperlinkButton x:Uid="ForgotPasswordButton"
+						 Name="ForgotPasswordButton"
+						 HorizontalAlignment="Right"
+						 FontSize="18"
+						 NavigateUri="http://support.snapchat.com/password-reset-request"
+						 Content="forgot password?"/>
+	</StackPanel>
+	
+</ContentDialog>

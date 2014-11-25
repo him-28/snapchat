@@ -3,9 +3,29 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Snapchat.Data;
+using Snapchat.Data.Responses;
 
 namespace Snapchat
 {
+	/// <summary>
+	/// The exception that is thrown when a set of credentials is invalid.
+	/// </summary>
+	public class InvalidCredentialsException
+		: Exception
+	{
+		public InvalidCredentialsException() { }
+		public InvalidCredentialsException(string message)
+			: base(message)
+		{
+		}
+	}
+
 	/// <summary>
 	/// Provides various methods for authentication and account registration.
 	/// </summary>
@@ -37,7 +57,7 @@ namespace Snapchat
 		/// <summary>
 		/// Defines the base URI of the API.
 		/// </summary>
-		private static readonly Uri BaseApiUri = new Uri("https://api.snapchat.com/");
+		private static readonly Uri BaseApiUri = new Uri("https://feelinsonice-hrd.appspot.com");
 
 
 
@@ -58,7 +78,7 @@ namespace Snapchat
 			var managers = new Dictionary<string, EndpointManager>();
 			foreach (string version in EndpointVersions)
 			{
-				var endpointUri = new Uri(BaseApiUri, version);
+				var endpointUri = new Uri(BaseApiUri, version + '/');
 				managers.Add(version, new EndpointManager(endpointUri, staticToken, secretToken, _userAgent));
 			}
 			Endpoints = managers;
@@ -81,5 +101,39 @@ namespace Snapchat
 			}
 		}
 		private string _userAgent;
+
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="username"></param>
+		/// <param name="password"></param>
+		/// <returns></returns>
+		public async Task<LogInResponse> AuthenticateAsync(string username, string password)
+		{
+			Contract.Requires<ArgumentNullException>(username != null);
+			Contract.Requires<ArgumentNullException>(password != null);
+			Debug.WriteLine("[Account] Authenticating account [username: {0} | password: {1}]", username, password);
+
+			string json =await Endpoints["loq"].PostToJsonAsync(
+				"login",
+				new RequestParameters
+				{
+					{"username", username},
+					{"password", password},
+					{
+						"features_map", JsonConvert.SerializeObject(new Dictionary<string, object>
+						{
+							{"all_updates_friends_response", true}
+						})
+					},
+				});
+			var response = JObject.Parse(json);
+
+			return response["logged"] == null
+				? new LogInResponse(Account.Deserialize(json))
+				: new LogInResponse(response["message"].ToString());
+		}
 	}
 }

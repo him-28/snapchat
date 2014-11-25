@@ -119,14 +119,10 @@ namespace Snapchat
 		/// <param name="token">
 		/// The auth token.
 		/// </param>
-		/// <param name="headerValues">
-		/// A dictionary containing additional headers to include in the POST request.
-		/// </param>
 		/// <returns>
 		/// A <see cref="HttpResponseMessage"/> received from the server.
 		/// </returns>
-		public async Task<HttpResponseMessage> PostAsync(
-			string function, RequestParameters args, string token, Dictionary<string, string> headerValues)
+		public async Task<HttpResponseMessage> PostAsync(string function, RequestParameters args, string token)
 		{
 			Contract.Requires<ArgumentNullException>(token != null);
 			Contract.Requires<ArgumentNullException>(function != null);
@@ -141,11 +137,6 @@ namespace Snapchat
 			client.DefaultRequestHeaders.TryAppendWithoutValidation("User-Agent", UserAgent);
 			client.DefaultRequestHeaders.TryAppendWithoutValidation("Accept", "*/*");
 			client.DefaultRequestHeaders.TryAppendWithoutValidation("Accept-Encoding", "gzip,deflate");
-			if (headerValues != null)
-			{
-				foreach (var header in headerValues)
-					client.DefaultRequestHeaders.Add(header.Key, header.Value);
-			}
 
 			// Send a POST request to the function, and return the response.
 			var endpoint = new Uri(BaseUri, function);
@@ -169,16 +160,13 @@ namespace Snapchat
 		public async Task<HttpResponseMessage> PostAsync(string function, RequestParameters args)
 		{
 			Contract.Requires<ArgumentNullException>(function != null);
-			return await PostAsync(function, args, StaticToken, null);
+			return await PostAsync(function, args, StaticToken);
 		}
 
 		/// <summary>
-		/// Sends a POST request to an API function using a <paramref name="token"/>, and deserializes
-		/// the response into the type specified by <typeparamref name="TResult"/>.
+		/// Sends a POST request to an API function using a <paramref name="token"/>, and returns
+		/// the response as a JSON string.
 		/// </summary>
-		/// <typeparam name="TResult">
-		/// The type of the object.
-		/// </typeparam>
 		/// <param name="function">
 		/// The name of the function.
 		/// </param>
@@ -188,22 +176,17 @@ namespace Snapchat
 		/// <param name="token">
 		/// The auth token.
 		/// </param>
-		/// <param name="headerValues">
-		/// A dictionary containing additional headers to include in the POST request.
-		/// </param>
 		/// <returns>
-		/// Upon success, the deserialized object; otherwise, the default value of
-		/// <typeparamref name="TResult"/>.
+		/// Upon success, the JSON string; otherwise, <c>null</c>.
 		/// </returns>
-		public async Task<TResult> PostAsync<TResult>(
-			string function, RequestParameters args, string token, Dictionary<string, string> headerValues)
+		public async Task<string> PostToJsonAsync(string function, RequestParameters args, string token)
 		{
 			Contract.Requires<ArgumentNullException>(function != null);
 			Contract.Requires<ArgumentNullException>(token != null);
 
-			var response = await PostAsync(function, args, token, headerValues);
+			var response = await PostAsync(function, args, token);
 			if (!response.IsSuccessStatusCode)
-				return default(TResult);
+				return null;
 
 			// Obtain the JSON data (and decompress it if it is gzipped).
 			string jsonData;
@@ -218,45 +201,13 @@ namespace Snapchat
 			}
 			Debug.WriteLine("[EndpointManager] Received JSON data: {0}", jsonData);
 
-			// Deserialize the JSON data and return it.
-			return await Task.Run(() => JsonConvert.DeserializeObject<TResult>(jsonData));
+			// Return the JSON data.
+			return jsonData;
 		}
 
 		/// <summary>
-		/// Sends a POST request to an API function using a <paramref name="token"/>, and deserializes
-		/// the response into the type specified by <typeparamref name="TResult"/>.
+		/// Sends a POST request to an API function and returns the response as a JSON string.
 		/// </summary>
-		/// <typeparam name="TResult">
-		/// The type of the object.
-		/// </typeparam>
-		/// <param name="function">
-		/// The name of the function.
-		/// </param>
-		/// <param name="args">
-		/// A set of parameters to pass along with the request.
-		/// </param>
-		/// <param name="token">
-		/// The auth token.
-		/// </param>
-		/// <returns>
-		/// Upon success, the deserialized object; otherwise, the default value of
-		/// <typeparamref name="TResult"/>.
-		/// </returns>
-		public async Task<TResult> PostAsync<TResult>(string function, RequestParameters args, string token)
-		{
-			Contract.Requires<ArgumentNullException>(function != null);
-			Contract.Requires<ArgumentNullException>(token != null);
-
-			return await PostAsync<TResult>(function, args, token, null);
-		}
-
-		/// <summary>
-		/// Sends a POST request to an API function and deserializes the response into the type
-		/// specified by <typeparamref name="TResult"/>.
-		/// </summary>
-		/// <typeparam name="TResult">
-		/// The type of the object.
-		/// </typeparam>
 		/// <param name="function">
 		/// The name of the function.
 		/// </param>
@@ -264,13 +215,12 @@ namespace Snapchat
 		/// A set of parameters to pass along with the request.
 		/// </param>
 		/// <returns>
-		/// Upon success, the deserialized object; otherwise, the default value of
-		/// <typeparamref name="TResult"/>.
+		/// Upon success, the JSON string; otherwise, <c>null</c>.
 		/// </returns>
-		public async Task<TResult> PostAsync<TResult>(string function, RequestParameters args)
+		public async Task<string> PostToJsonAsync(string function, RequestParameters args)
 		{
 			Contract.Requires<ArgumentNullException>(function != null);
-			return await PostAsync<TResult>(function, args, StaticToken, null);
+			return await PostToJsonAsync(function, args, StaticToken);
 		}
 
 		#endregion

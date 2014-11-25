@@ -2,13 +2,23 @@
 using System.Diagnostics;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Resources;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Snapchat;
 
 namespace ColdSnap
 {
     public sealed partial class App
     {
+	    public const string SnapchatStaticKey = "m198sOkJEn37DjqZ32lpRu76xmw288xSQ9";
+	    public const string SnapchatSecretKey = "iEk21fuwZApXlz93750dmW22pw389dPwOk";
+
+	    public static readonly SnapchatManager Snapchat =
+		    new SnapchatManager(SnapchatStaticKey, SnapchatSecretKey);
+
+		public static readonly ResourceLoader Strings = new ResourceLoader();
+
         public App()
         {
             InitializeComponent();
